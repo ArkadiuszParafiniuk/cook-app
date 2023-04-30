@@ -1,0 +1,31 @@
+<div *ngIf="edit">Edit mode</div>
+
+<div>
+    <span class="font-semibold text-xl">{{title}}</span>
+    <div>{{typeOfDish | typeOfDishValue}}</div>
+    <ng-container *ngFor="let tag of tags">
+      <button class='btn px-2 bg-green-500 rounded-md mr-2'>
+        {{tag}}
+      </button>
+    </ng-container>
+    <table class="w-full" #table mat-table [dataSource]="ingredients">
+      <ng-container class="w-8/12" matColumnDef="ingredient">
+        <th mat-header-cell *matHeaderCellDef > Składnik </th>
+        <td mat-cell *matCellDef="let row"> {{row.ingredient}} </td>
+      </ng-container>
+      <ng-container class="w-4/12" matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef > Ilość </th>
+        <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+    <mat-form-field class="my-4">
+        <textarea
+          matInput
+          placeholder="Przepis"
+          formControlName="message"
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="6">{{content}}</textarea>
+    </mat-form-field>
+</div>
