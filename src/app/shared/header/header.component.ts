@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {RecipeService} from "../../services/recipe.service";
 
 @Component({
   selector: 'app-header',
@@ -7,8 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
   title: string = 'Przepiśnik 2.0';
+  isEditEnabled: boolean = false;
 
-  constructor() {}
+  constructor(private service: RecipeService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.service.isEditEnabledOnBackend().subscribe((data) => {
+      this.isEditEnabled = data;
+    });
+  }
 }

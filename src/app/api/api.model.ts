@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export interface Recipe {
   uuid: string;
   title: string;
@@ -8,8 +10,18 @@ export interface Recipe {
 }
 
 export interface Ingredient {
+  uuid: string;
   ingredient: string;
   amount: string;
+}
+
+export function createIngredient(ingredient: string, amount: string): Ingredient {
+  const uuid = uuidv4();
+  return {
+    uuid: uuid,
+    ingredient,
+    amount,
+  };
 }
 
 export enum TypeOfDish {

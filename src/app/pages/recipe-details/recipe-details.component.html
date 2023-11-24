@@ -1,32 +1,81 @@
-<div *ngIf="edit">Edit mode</div>
-
 <div>
-    <span class="font-semibold text-xl">{{title}}</span>
-    <div>{{typeOfDish | typeOfDishValue}}</div>
-    <ng-container *ngFor="let tag of tags">
-      <button class='btn px-2 bg-green-500 rounded-md mr-2'>
-        {{tag}}
-      </button>
+  <span *ngIf="!isEditMode" class="font-semibold text-xl">{{title}}</span>
+  <span *ngIf="isEditMode" class="font-semibold text-xl">
+    <mat-form-field class="w-full">
+        <input matInput placeholder="Tytuł przepisu" [value]="title">
+    </mat-form-field>
+  </span>
+
+
+  <div>{{typeOfDish | typeOfDishValue}}</div>
+  <ng-container *ngFor="let tag of tags">
+    <button class='btn px-2 bg-green-500 rounded-md mr-2'>
+      {{tag}}
+    </button>
+  </ng-container>
+
+  <table *ngIf="!isEditMode" class="w-full" #table mat-table [dataSource]="ingredients">
+    <ng-container class="w-8/12" matColumnDef="ingredient">
+      <th mat-header-cell *matHeaderCellDef> Składnik</th>
+      <td mat-cell *matCellDef="let row"> {{row.ingredient}} </td>
     </ng-container>
-    <table class="w-full" #table mat-table [dataSource]="ingredients">
-      <ng-container class="w-8/12" matColumnDef="ingredient">
-        <th mat-header-cell *matHeaderCellDef > Składnik </th>
-        <td mat-cell *matCellDef="let row"> {{row.ingredient}} </td>
-      </ng-container>
-      <ng-container class="w-4/12" matColumnDef="amount">
-        <th mat-header-cell *matHeaderCellDef > Ilość </th>
-        <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
-    </table>
-    <mat-form-field class="my-4">
+    <ng-container class="w-4/12" matColumnDef="amount">
+      <th mat-header-cell *matHeaderCellDef> Ilość</th>
+      <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+  </table>
+  <table *ngIf="isEditMode" class="w-full" #table mat-table [dataSource]="ingredients">
+    <ng-container class="w-8/12" matColumnDef="ingredient">
+      <th mat-header-cell *matHeaderCellDef> Składnik</th>
+      <td mat-cell *matCellDef="let row" [attr.contenteditable]=true (blur)="onIngredientChange(row.uuid, row.ingredient, row.amount)"> {{row.ingredient}} </td>
+    </ng-container>
+    <ng-container class="w-3/12" matColumnDef="amount">
+      <th mat-header-cell *matHeaderCellDef> Ilość</th>
+      <td mat-cell *matCellDef="let row" [attr.contenteditable]=true (blur)="onIngredientChange(row.uuid, row.ingredient, row.amount)"> {{row.amount}} </td>
+    </ng-container>
+    <ng-container class="w-1/12" matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row">
+        <button (click)="removeIngredient(row.uuid)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columnsWithEditable"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnsWithEditable;"></tr>
+  </table>
+  <div *ngIf="isEditMode">
+    <button (click)="addIngredient()" class='btn px-2 bg-green-500 rounded-md mr-2'>
+      Dodaj składnik
+    </button>
+  </div>
+
+  <mat-form-field class="w-full">
         <textarea
           matInput
           placeholder="Przepis"
-          formControlName="message"
           cdkTextareaAutosize
           cdkAutosizeMinRows="6"
-          value={{content}}></textarea>
-    </mat-form-field>
+          value={{content}}
+          readonly={{!isEditMode}}></textarea>
+  </mat-form-field>
+
+  <ng-container *ngIf="!isEditMode && isEditEnabled">
+    <button (click)="editButtonClicked()" class='btn px-2 bg-green-500 rounded-md mr-2'>
+      Edytuj
+    </button>
+    <button *ngIf="isEditEnabled" class='btn px-2 bg-red-500 rounded-md mr-2'>
+      Usuń
+    </button>
+  </ng-container>
+  <ng-container *ngIf="isEditMode">
+    <button (click)="saveButtonClicked()" class='btn px-2 bg-green-500 rounded-md mr-2'>
+      Zapisz
+    </button>
+    <button (click)="cancelButtonClicked()" class='btn px-2 bg-red-500 rounded-md mr-2'>
+      Anuluj
+    </button>
+  </ng-container>
 </div>

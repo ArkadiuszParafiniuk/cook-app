@@ -3,16 +3,17 @@ import {Injectable} from '@angular/core';
 import {Recipe} from '../api/api.model';
 import {Observable} from 'rxjs';
 import {environment} from "../../environments/environment";
+import { Location } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RecipeService {
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private location: Location) {
   }
 
   getAll(): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${environment.base_url}/recipe/getAll`);
+    return this.http.get<Recipe[]>(this.getBaseUrl() + `/recipe/getAll`);
   }
 
   find(
@@ -32,11 +33,11 @@ export class RecipeService {
       fromObject: filters,
     });
 
-    return this.http.get<Recipe[]>(`${environment.base_url}/recipe/find`, {params: params});
+    return this.http.get<Recipe[]>(this.getBaseUrl() + `/recipe/find`, {params: params});
   }
 
   getByUuid(uuid: string): Observable<Recipe> {
-    return this.http.get<Recipe>(`${environment.base_url}/recipe/` + uuid);
+    return this.http.get<Recipe>(this.getBaseUrl() + `/recipe/` + uuid);
   }
 
   findTagsByName(
@@ -49,7 +50,23 @@ export class RecipeService {
       fromObject: filters,
     });
 
-    return this.http.get<string[]>(`${environment.base_url}/recipeTag/find`, {params: params});
+    return this.http.get<string[]>(this.getBaseUrl() + `/recipeTag/find`, {params: params});
+  }
+
+  isEditEnabled(): boolean {
+    const dummyAnchor = document.createElement('a');
+    dummyAnchor.href = this.location.prepareExternalUrl(this.location.path());
+    return !dummyAnchor.hostname.startsWith('193.');
+  }
+
+  isEditEnabledOnBackend(): Observable<boolean> {
+    return this.http.get<boolean>(this.getBaseUrl() + `/recipe/isEditEnabled`);
+  }
+
+  getBaseUrl(): string {
+    const dummyAnchor = document.createElement('a');
+    dummyAnchor.href = this.location.prepareExternalUrl(this.location.path());
+    return "http://" + dummyAnchor.hostname + ":" + environment.backendport;
   }
 
 }
